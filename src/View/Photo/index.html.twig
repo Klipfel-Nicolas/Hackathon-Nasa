@@ -1,0 +1,120 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Photos{% endblock %}
+{% block content %}
+    <a href="/" uk-icon="icon: arrow-left; ratio: 2" class="uk-icon-link uk-align-left uk-margin-left" style="color: #FFB285FF">Accueil</a>
+    <img src="/assets/images/logo.png" alt="logo" class="logo">
+
+    <div class="uk-padding-large uk-light ">
+
+
+        <h1 class="uk-text-center" style="font-family: var(--orbiton-font);">Présentation du rover</h1>
+        {% for rover in rovers %}
+            <div class="uk-flex-center" uk-grid>
+                <div class="uk-card uk-card-default uk-card-body uk-width-1-3@m uk-border-rounded" style="background-color: rgba(255, 135, 63, 1)">
+                    <h3 class="uk-card-title">{{rover.name}} - {{rover.status}}</h3>
+                    {% if name == 'curiosity' %}
+                        <img src="{{roverImages.collection.items.36.links.0.href}}">
+                    {% elseif name == 'spirit' %}
+                        <img src="{{roverImages.collection.items.16.links.0.href}}">
+                    {% elseif name == 'opportunity' %}
+                        <img src="{{roverImages.collection.items.18.links.0.href}}">
+                    {% endif %}
+                    <p>Lancé à la date de {{rover.launch_date}}, {{rover.name}} a atteint mars le {{rover.landing_date}}. </p><br>
+                    <p>Cela fait {{rover.max_sol}} jour qu'il roule sur mars, pour un total de {{rover.total_photos}} photos prises. </p>
+                </div>
+            </div>
+            {% endfor %}
+
+        <!--slide-->
+        <h1 class="uk-text-center uk-margin-small-bottom" style="font-family: var(--orbiton-font);">Photos liées au rover</h1>
+        <div class="uk-position-relative uk-visible-toggle uk-light " tabindex="-1" uk-slider="autoplay: true; autoplay-interval: 2000">
+            <ul class="uk-slider-items uk-child-width-1-2 uk-child-width-1-3@s uk-child-width-1-4@m uk-border-rounded">
+                {% for rover in roverImages.collection.items|slice(0,20) %}
+                    <li>
+                        <div uk-lightbox="animation: slide">
+                            <a class="uk-inline" href="{{rover.links.0.href}}" data-caption="{{ rover.data.0.title }}">
+                                <img src="{{rover.links.0.href}}" alt="" width="400" style="max-height: 300px; min-height: 216px">
+                            </a>
+                        </div>
+                        <div class="uk-overlay uk-overlay-primary uk-position-bottom">
+                            <p class="uk-margin-remove">{{ rover.data.0.title }}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <a class="uk-position-center-left uk-position-small uk-hidden-hover" href="#" uk-slidenav-previous uk-slider-item="previous"></a>
+            <a class="uk-position-center-right uk-position-small uk-hidden-hover" href="#" uk-slidenav-next uk-slider-item="next"></a>
+        </div>
+<hr/>
+        
+        <div class="uk-text-center">
+        <form method="POST" class=" uk-flex-inline">
+
+        <h3 class="uk-text-center uk-margin-small-right uk-margin-small-top" style="color: #FFB285FF">Jour</h3>
+
+            <input class ="uk-number uk-form-large uk-width-auto uk-margin-small-left" type="number" id="sol" name="sol" value="1000"
+                   min="0" max="1000">
+
+            <select class="uk-select uk-form-large uk-width-auto uk-margin-small-left" name="cam" required>
+                <option selected disabled value="">---Choisir une caméra---</option>
+                <option value="navcam">Nav Camera</option>
+                <option value="fhaz">Front Camera</option>
+                <option value="rhaz">Back Camera</option>
+            </select>
+
+            <input class="uk-input uk-form-large uk-width-auto uk-margin-small-left" type="submit" value="chercher">
+        </form>
+        </div>
+
+        {% for picture in pictures %}
+            {% if picture[random(picture|length -1)]['img_src'] is not defined %}
+                <h1 class="uk-text-center" style="font-family: var(--orbiton-font);"> Pas de photos dommage!</h1>
+                {% else %}
+                <!-- affiche une image au hasard -->
+                <div class=" uk-grid-match  uk-grid-match uk-flex-center" uk-grid>
+                    <div class="uk-card uk-card-default uk-card-body uk-width-1-3@m uk-margin-small-right uk-border-rounded" style="background-color: rgba(255, 135, 63, 1)">
+                        <h3 class="uk-card-title" style="font-family: var(--orbiton-font);">Picture of {{picture.0.rover.name}}</h3>
+                        <img class="uk-card-media" src="{{picture[random(picture|length -1)]['img_src']}}" width="300" height="300" alt="">
+                        <p>Picture took with the {{picture.0.camera.full_name}} at {{picture.0.earth_date}}</p>
+                    </div><br>
+                    <div class="uk-card uk-card-default uk-card-body uk-width-1-3@m uk-border-rounded" style="background-color: rgb(255,178,133)">
+                        <h3 class="uk-card-title" style="font-family: var(--orbiton-font);">Picture of {{picture.0.rover.name}}</h3>
+                        <img class="uk-card-media" src="{{picture[random(picture|length -1)]['img_src']}}" width="300" height="300" alt="">
+                        <p>Picture took with the {{picture.0.camera.full_name}} at {{picture.0.earth_date}}</p>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- affiche toutes les images -->
+                <div class="uk-child-width-1-4@m uk-child-width-1-5@xl uk-child-width-1-2@s uk-grid-match" uk-grid uk-height-match="target: > div > .uk-card">
+                    {% for pic in picture|slice(0,30) %}
+                        <div class="uk-align-center" style="margin-top:30px;">
+                            <div class="uk-card uk-card-default uk-card-body uk-border-rounded"
+                                 {% if loop.index%2 == 0 %}
+                                 style="background-color: rgba(255, 135, 63, 1)"
+                                 {% else %}
+                                     style="background-color: rgb(255,178,133)"
+                                 {% endif %}
+                            >
+                                <h3 class="uk-card-title" style="font-family: var(--orbiton-font);">Picture of {{pic.rover.name}}</h3>
+                                <div uk-lightbox="animation: slide">
+                                    <a class="uk-inline" href="{{pic.img_src}}" data-caption="Picture took with the {{pic.camera.full_name}} at {{pic.earth_date}}">
+                                        <img class="uk-card-media" src="{{pic.img_src}}" width="300" height="300" alt="{{pic.camera.full_name}}">
+                                    </a>
+                                </div>
+                                <p>Picture took with the {{pic.camera.full_name}} at {{pic.earth_date}}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+
+    </div>
+
+    <a href="" uk-totop uk-scroll data-uk-smooth-scroll width="40" height="40" class="uk-flex uk-flex-right uk-margin-medium-right"></a>
+
+{% endblock %}
